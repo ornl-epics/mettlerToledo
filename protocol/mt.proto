@@ -58,7 +58,7 @@ mtGetI5 {
 # /// Read the immediate weight
 mtGetSI {
    out "SI";
-   in "S %(\$1)c %f %(\$2)s";
+   in "S %(\$1_STAT)c %f %(\$1_EGU)s";
 }
 
 

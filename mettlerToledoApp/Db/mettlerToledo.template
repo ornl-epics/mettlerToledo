@@ -103,7 +103,7 @@ record(stringin, "$(P):I5") {
 record(ai, "$(P):SI") {
   field(DESC, "Immediate Weight")
   field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetSI($(P):SI_STAT, $(P):SI_EGU) $(PORT) $(ADDR)")
+  field(INP, "@mt.proto mtGetSI($(P):SI) $(PORT) $(ADDR)")
   field(SCAN, "Passive")
   field(PREC, "$(PREC=3)")
   field(HHSV,"MAJOR")
