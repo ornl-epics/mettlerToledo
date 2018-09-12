@@ -15,6 +15,7 @@ example_DBD += base.dbd
 example_DBD += asyn.dbd
 example_DBD += drvAsynIPPort.dbd
 example_DBD += stream.dbd
+example_DBD += asSupport.dbd
 
 # example_registerRecordDeviceDriver.cpp derives from example.dbd
 example_SRCS += example_registerRecordDeviceDriver.cpp
@@ -26,6 +27,7 @@ example_SRCS_vxWorks += -nil-
 # Link in the code from our support library
 example_LIBS += asyn
 example_LIBS += stream
+example_LIBS += autosave
 
 # Finally link IOC to the EPICS Base libraries
 example_LIBS += $(EPICS_BASE_IOC_LIBS)

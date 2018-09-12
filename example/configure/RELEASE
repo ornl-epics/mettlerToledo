@@ -24,6 +24,7 @@
 
 ASYN=           /home/controls/epics/asyn/master
 STREAMDEVICE=   /home/controls/epics/StreamDevice/master
+AUTOSAVE=       /home/controls/epics/autosave/master
 METTLERTOLEDO=  /home/controls/epics/mettlerToledo/master
 
 # EPICS_BASE should appear last so earlier modules can override stuff:

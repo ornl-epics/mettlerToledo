@@ -19,8 +19,8 @@ example_registerRecordDeviceDriver pdbbase
 
 drvAsynIPPortConfigure("MT1","192.168.200.177:4001",0,0,0)
 
-#asynSetTraceIOMask("MT1",0,0xFF)
-#asynSetTraceMask("MT1",0,0xFF)
+asynSetTraceIOMask("MT1",0,0xFF)
+asynSetTraceMask("MT1",0,0xFF)
 
 ##########################################################
 

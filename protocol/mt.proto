@@ -25,31 +25,31 @@ LongTimeout = 30000;
 # /// Send a cancel command
 mtCancel {
    out "@";
-   in "I4 A \"%s\"";
+   in "I4\_A\_\"%[0-9A-Z]\"";
 }
 
 # /// Read the device ID
 mtGetI2 {
    out "I2";
-   in "I2 A \"%s\"";
+   in "I2 A \"%c\"";
 }
 
 # /// Read the software version
 mtGetI3 {
    out "I3";
-   in "I3 A \"%s\"";
+   in "I3 A \"%c\"";
 }
 
 # /// Read the serial number
 mtGetI4 {
    out "I4";
-   in "I4 A \"%s\"";
+   in "I4 A \"%c\"";
 }
 
 # /// Read the software ID
 mtGetI5 {
    out "I5";
-   in "I5 A \"%s\"";
+   in "I5 A \"%c\"";
 }
 
 ###################################################
