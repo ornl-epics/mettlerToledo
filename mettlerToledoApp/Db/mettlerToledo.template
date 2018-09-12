@@ -1,0 +1,127 @@
+
+#######################################################
+# 
+# Template file for Mettler Toledo Balances.
+#
+# This file provides MT-SICS level 0 and 1 functions
+# which should work across the Mettler Toledo range.
+#
+# Macros:
+# P - Base PV name
+# PORT - Bus/Port Address (eg. ASYN Port).
+# ADDR - Address on the bus (optional)
+# 
+#
+#######################################################
+
+# ///
+# /// Enable/Disable polling
+# ///
+record(bo, "$(P):ControlPoll") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "Poll Enabled")
+  field(ONAM, "Poll Disabled")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+# ///
+# /// Startup commands
+# ///
+record(seq, "$(P):Init") {
+  field(DOL1, "1")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DOL4, "1")
+  field(DOL5, "1")
+  field(DOL6, "1")
+  field(DOL7, "0")
+  field(DLY1, "1")
+  field(DLY2, "1")
+  field(DLY3, "0")
+  field(DLY4, "0")
+  field(DLY5, "0")
+  field(DLY6, "0")
+  field(DLY7, "0")
+  field(LNK1, "$(P):ControlPoll PP")
+  field(LNK2, "$(P):Cancel.PROC PP")
+  field(LNK3, "$(P):I2.PROC PP")
+  field(LNK4, "$(P):I3.PROC PP")
+  field(LNK5, "$(P):I4.PROC PP")
+  field(LNK6, "$(P):I5.PROC PP")
+  field(LNK7, "$(P):ControlPoll PP")
+  field(PINI, "YES")
+}
+
+# ///
+# /// Do a cancel
+# ///
+record(stringin, "$(P):Cancel") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtCancel $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the device ID
+# ///
+record(stringin, "$(P):I2") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtGetI2 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the software version
+# ///
+record(stringin, "$(P):I3") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtGetI3 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the serial number
+# ///
+record(stringin, "$(P):I4") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtGetI4 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the software ID
+# ///
+record(stringin, "$(P):I5") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtGetI5 $(PORT) $(ADDR)")
+}
+
+#######################################################
+# Polling commands
+
+# ///
+# /// Read the immediate weight, status and units
+# ///
+record(ai, "$(P):SI") {
+  field(DESC, "Immediate Weight")
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtGetSI($(P):SI_STAT, $(P):SI_EGU) $(PORT) $(ADDR)")
+  field(SCAN, "Passive")
+  field(PREC, "$(PREC=3)")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HIHI,"10000")
+  field(HIGH,"10000")
+  field(LOW,"-10000")
+  field(LOLO,"-10000")
+  field(SDIS, "$(P):ControlPoll")
+  info(autosaveFields, "HIHI HIGH LOW LOLO AOFF SCAN")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(stringin, "$(P):SI_STAT") {
+  field(DESC, "Immediate Weight Stat")
+}
+record(stringin, "$(P):SI_EGU") {
+  field(DESC, "Immediate Weight Unit")
+}
+
