@@ -25,46 +25,73 @@ LongTimeout = 30000;
 # Note: for the string commands the device will send 
 #       a string back in quotes like "blah" so it's 
 #       hard to use %s or %c without getting the quotes.
-#       So I found that character based format 
-#       converter works fine.
+#       So I found that character based format converter 
+#       works fine, where I read all characters except a quote mark.
 
 # /// Send a cancel command
 mtCancel {
    out "@";
-   in "I4\_A\_\"%[0-9A-Z]\"";
+   in "I4 A \"%[^\"]\"";
 }
 
 # /// Read the device ID
 mtGetI2 {
    out "I2";
-   in "I2 A \"%c\"";
+   in "I2 A \"%[^\"]\"";
 }
 
 # /// Read the software version
 mtGetI3 {
    out "I3";
-   in "I3 A \"%c\"";
+   in "I3 A \"%[^\"]\"";
 }
 
 # /// Read the serial number
 mtGetI4 {
    out "I4";
-   in "I4 A \"%c\"";
+   in "I4 A \"%[^\"]\"";
 }
 
 # /// Read the software ID
 mtGetI5 {
    out "I5";
-   in "I5 A \"%c\"";
+   in "I5 A \"%[^\"]\"";
 }
 
 ###################################################
-# Immediate response functions
+# Immediate response or fast set/read functions
 
 # /// Read the immediate weight
 mtGetSI {
    out "SI";
    in "S %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "S %(\$1_STAT)c";}
 }
 
+# /// Perform an immediate tare. We also read back the tare
+# /// weight if it was successful.
+mtSetTI {
+   out "TI";
+   in "TI %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "TI %(\$1_STAT)c";}
+}
+
+# /// Perform an immediate zero.
+mtSetZI {
+   out "ZI";
+   in "ZI %(\$1_STAT)c";
+}
+
+# /// Read the tare weight
+mtGetTA {
+   out "TA";
+   in "TA %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "TA %(\$1_STAT)c";}
+}
+
+# /// Clear the tare weight
+mtSetTAC {
+   out "TAC";
+   in "TAC %(\$1_STAT)c";
+}
 
