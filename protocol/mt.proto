@@ -22,6 +22,12 @@ LongTimeout = 30000;
 ###################################################
 # Functions to run once at startup
 
+# Note: for the string commands the device will send 
+#       a string back in quotes like "blah" so it's 
+#       hard to use %s or %c without getting the quotes.
+#       So I found that character based format 
+#       converter works fine.
+
 # /// Send a cancel command
 mtCancel {
    out "@";
