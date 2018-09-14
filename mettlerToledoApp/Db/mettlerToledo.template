@@ -253,10 +253,8 @@ record(bo, "$(P):Z") {
   field(FLNK, "$(P):TA:Do")
 }
 
-########################################################
-# Software limits for the weights
 
-#record(
+
 
 
 # ///
@@ -264,7 +262,7 @@ record(bo, "$(P):Z") {
 # /// sending commands and reading
 # /// connected status
 # ///
-record(asyn,"$(P):Asyn")
+record(asyn, "$(P):Asyn")
 {
     field(DTYP,"asynRecordDevice")
     field(PORT,"$(PORT)")
