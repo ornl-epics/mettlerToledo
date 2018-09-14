@@ -92,7 +92,7 @@ record(seq, "$(P):ScanOnce") {
 # ///
 record(stringin, "$(P):I2") {
   field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetI2 $(PORT) $(ADDR)")
+  field(INP, "@mt.proto mtI2 $(PORT) $(ADDR)")
 }
 
 # ///
@@ -100,7 +100,7 @@ record(stringin, "$(P):I2") {
 # ///
 record(stringin, "$(P):I3") {
   field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetI3 $(PORT) $(ADDR)")
+  field(INP, "@mt.proto mtI3 $(PORT) $(ADDR)")
 }
 
 # ///
@@ -108,7 +108,7 @@ record(stringin, "$(P):I3") {
 # ///
 record(stringin, "$(P):I4") {
   field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetI4 $(PORT) $(ADDR)")
+  field(INP, "@mt.proto mtI4 $(PORT) $(ADDR)")
 }
 
 # ///
@@ -116,43 +116,18 @@ record(stringin, "$(P):I4") {
 # ///
 record(stringin, "$(P):I5") {
   field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetI5 $(PORT) $(ADDR)")
+  field(INP, "@mt.proto mtI5 $(PORT) $(ADDR)")
 }
 
 #######################################################
 # Weight, Tare and Zero commands
 
 # ///
-# /// Read the immediate weight, status and units
+# /// Immedate Weight
 # ///
-record(bo, "$(P):SI:Read") {
-  field(DESC, "Immediate Weight")
-  field(VAL, "1")
-  field(OUT, "$(P):SI.PROC PP")
-}
-record(ai, "$(P):SI") {
-  field(DESC, "Immediate Weight (SI)")
-  field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetSI($(P):SI) $(PORT) $(ADDR)")
-  field(SCAN, "Passive")
-  field(PREC, "$(PREC=3)")
-  field(HHSV,"MAJOR")
-  field(HSV, "MINOR")
-  field(LSV, "MINOR")
-  field(LLSV,"MAJOR")
-  field(HIHI,"50000")
-  field(HIGH,"10000")
-  field(LOW,"-10000")
-  field(LOLO,"-50000")
-  info(autosaveFields, "HIHI HIGH LOW LOLO AOFF")
-  info(archive, "Monitor, 00:00:01, VAL")   
-}
-record(stringin, "$(P):SI_STAT") {
-  field(DESC, "Immediate Weight Stat")
-}
-record(stringin, "$(P):SI_EGU") {
-  field(DESC, "Immediate Weight Unit")
-}
+substitute "CMD=SI"
+substitute "CMD_DESC=Immediate Weight"
+include "mettlerToledoWeightResponse.template"
 
 # ///
 # /// Provide a menu to the user to set the polling frequency
@@ -186,92 +161,80 @@ record(bo, "$(P):SI:DoScan") {
   field(SDIS, "$(P):ControlPoll")
 }
 
+# ///
+# /// Immedate Zero
+# ///
+substitute "CMD=ZI"
+substitute "CMD_DESC=Immediate Zero"
+include "mettlerToledoStatusResponse.template"
 
-# ///
-# /// Do an immediate zero
-# ///
-record(bo, "$(P):Zero") {
-  field(DESC, "Immediate Zero")
-  field(VAL, "1")
-  field(OUT, "$(P):ZI.PROC PP")
-}
 record(bo, "$(P):ZI") {
-  field(DESC, "Immediate Zero (ZI)")
-  field(DTYP, "stream")
-  field(OUT, "@mt.proto mtSetZI($(P):ZI) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):TA:Do")
 }
-record(stringin, "$(P):ZI_STAT") {
-  field(DESC, "Immediate Zero Stat")
-}
-
 
 # ///
 # /// Do an immediate tare, and also read back the tare weight, status and units
 # /// I'm not sure the TI weight readback is useful since the device seems to 
 # /// only give back the correct tare weight if I run TI again, or execute
-# /// TA. So I forward link to $(P):TareRead.
+# /// TA. So I forward link to $(P):TA:Read.
 # ///
-record(bo, "$(P):Tare") {
-  field(DESC, "Immediate Tare")
-  field(VAL, "1")
-  field(OUT, "$(P):TI.PROC PP")
-}
+substitute "CMD=TI"
+substitute "CMD_DESC=Immediate Tare"
+include "mettlerToledoWeightResponse.template"
+
+substitute "CMD=TA"
+substitute "CMD_DESC=Read Tare"
+include "mettlerToledoWeightResponse.template"
+
 record(ai, "$(P):TI") {
-  field(DESC, "Immediate Tare (TI)")
-  field(DTYP, "stream")
-  field(INP, "@mt.proto mtSetTI($(P):TI) $(PORT) $(ADDR)")
-  field(SCAN, "Passive")
-  field(PREC, "$(PREC=3)")
-  field(FLNK, "$(P):TareRead")
-  info(archive, "Monitor, 00:00:01, VAL")   
-}
-record(stringin, "$(P):TI_STAT") {
-  field(DESC, "Immediate Tare Stat")
-}
-record(stringin, "$(P):TI_EGU") {
-  field(DESC, "Immediate Tare Unit")
-}
-
-
-# ///
-# /// Read the stored tare weight
-# ///
-record(bo, "$(P):TareRead") {
-  field(VAL, "1")
-  field(OUT, "$(P):TA.PROC PP")
-}
-record(ai, "$(P):TA") {
-  field(DESC, "Tare Weight (TA)")
-  field(DTYP, "stream")
-  field(INP, "@mt.proto mtGetTA($(P):TA) $(PORT) $(ADDR)")
-  field(SCAN, "Passive")
-  field(PREC, "$(PREC=3)")
-  info(archive, "Monitor, 00:00:01, VAL")   
-}
-record(stringin, "$(P):TA_STAT") {
-  field(DESC, "Tare Weight Stat")
-}
-record(stringin, "$(P):TA_EGU") {
-  field(DESC, "Tare Weight Unit")
+  field(FLNK, "$(P):TA:Do")
 }
 
 # ///
-# /// Clear the stored tare weight. Then read it back.
+# /// Clear the stored tare weight. 
+# /// Then read it back, so I forward link to $(P):TA:Read
 # ///
-record(bo, "$(P):TareClear") {
-  field(VAL, "1")
-  field(OUT, "$(P):TAC.PROC PP")
-}
+substitute "CMD=TAC"
+substitute "CMD_DESC=Clear Tare"
+include "mettlerToledoStatusResponse.template"
+
 record(bo, "$(P):TAC") {
-  field(DESC, "Tare Clear (TAC)")
-  field(DTYP, "stream")
-  field(OUT, "@mt.proto mtSetTAC($(P):TAC) $(PORT) $(ADDR)")
-  field(FLNK, "$(P):TareRead")
-}
-record(stringin, "$(P):TAC_STAT") {
-  field(DESC, "Tare Clear Stat")
+  field(FLNK, "$(P):TA:Do")
 }
 
 
+########################################################
+# The following Weight, Tare and Zero commands block until
+# the scale is in stable state. There is some built in timeout 
+# in the scale, which seems to be around 20-30s.
+#
 
+# ///
+# /// Stable Weight
+# ///
+substitute "CMD=S"
+substitute "CMD_DESC=Stable Weight"
+include "mettlerToledoWeightResponse.template"
+
+# ///
+# /// Stable Tare. Like above, read back the tare weight afterwards.
+# ///
+substitute "CMD=T"
+substitute "CMD_DESC=Stable Tare"
+include "mettlerToledoWeightResponse.template"
+
+record(ai, "$(P):T") {
+  field(FLNK, "$(P):TA:Do")
+}
+
+# ///
+# /// Stable Zero
+# ///
+substitute "CMD=Z"
+substitute "CMD_DESC=Stable Zero"
+include "mettlerToledoStatusResponse.template"
+
+record(bo, "$(P):Z") {
+  field(FLNK, "$(P):TA:Do")
+}
 

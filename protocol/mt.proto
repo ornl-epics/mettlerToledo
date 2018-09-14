@@ -17,7 +17,8 @@
 Terminator = "\r\n";
 ReplyTimeout = 1000;
 
-LongTimeout = 30000;
+#The timeout for stable commands
+LongTimeout = 60000;
 
 ###################################################
 # Functions to run once at startup
@@ -35,25 +36,25 @@ mtCancel {
 }
 
 # /// Read the device ID
-mtGetI2 {
+mtI2 {
    out "I2";
    in "I2 A \"%[^\"]\"";
 }
 
 # /// Read the software version
-mtGetI3 {
+mtI3 {
    out "I3";
    in "I3 A \"%[^\"]\"";
 }
 
 # /// Read the serial number
-mtGetI4 {
+mtI4 {
    out "I4";
    in "I4 A \"%[^\"]\"";
 }
 
 # /// Read the software ID
-mtGetI5 {
+mtI5 {
    out "I5";
    in "I5 A \"%[^\"]\"";
 }
@@ -62,7 +63,7 @@ mtGetI5 {
 # Immediate response or fast set/read functions
 
 # /// Read the immediate weight
-mtGetSI {
+mtSI {
    out "SI";
    in "S %(\$1_STAT)c %f %(\$1_EGU)s";
    @mismatch {in "S %(\$1_STAT)c";}
@@ -70,28 +71,52 @@ mtGetSI {
 
 # /// Perform an immediate tare. We also read back the tare
 # /// weight if it was successful.
-mtSetTI {
+mtTI {
    out "TI";
    in "TI %(\$1_STAT)c %f %(\$1_EGU)s";
    @mismatch {in "TI %(\$1_STAT)c";}
 }
 
 # /// Perform an immediate zero.
-mtSetZI {
+mtZI {
    out "ZI";
    in "ZI %(\$1_STAT)c";
 }
 
 # /// Read the tare weight
-mtGetTA {
+mtTA {
    out "TA";
    in "TA %(\$1_STAT)c %f %(\$1_EGU)s";
    @mismatch {in "TA %(\$1_STAT)c";}
 }
 
 # /// Clear the tare weight
-mtSetTAC {
+mtTAC {
    out "TAC";
    in "TAC %(\$1_STAT)c";
 }
+
+###################################################
+# Blocking set/read functions
+
+mtS {
+   ReplyTimeout = $LongTimeout;
+   out "S";
+   in "S %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "S %(\$1_STAT)c";}
+}
+
+mtT {
+   ReplyTimeout = $LongTimeout;
+   out "T";
+   in "T %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "T %(\$1_STAT)c";}
+}
+
+mtZ {
+   ReplyTimeout = $LongTimeout;
+   out "Z";
+   in "Z %(\$1_STAT)c";
+}
+
 

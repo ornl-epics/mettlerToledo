@@ -5,6 +5,8 @@ include $(TOP)/configure/CONFIG
 
 # Install databases, templates & substitutions like this
 DB += mettlerToledo.template
+DB += mettlerToledoWeightResponse.template
+DB += mettlerToledoStatusResponse.template
 
 # If <anyname>.db template is not named <anyname>*.template add
 # <anyname>_TEMPLATE = <templatename>
