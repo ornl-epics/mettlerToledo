@@ -46,14 +46,18 @@ record(seq, "$(P):Info") {
   field(DOL5, "1")
   field(DLY5, "0.2")
   field(LNK5, "$(P):I5.PROC PP")
-  field(DOL6, "0")
-  field(DLY6, "0.5")
-  field(LNK6, "$(P):ControlPoll PP")
+  field(DOL6, "1")
+  field(DLY6, "0.2")
+  field(LNK6, "$(P):ScanOnce.PROC PP")
+  field(DOL7, "0")
+  field(DLY7, "0.5")
+  field(LNK7, "$(P):ControlPoll PP")
 }
 
 # ///
 # /// Do a cancel. This will cancel any active command and also clear
 # /// volatile memory such as tare weight. It's like a power cycle.
+# /// After the cancel I read a few of the immediate parameters back.
 # ///
 record(seq, "$(P):Cancel") {
   field(DOL1, "1")
@@ -62,13 +66,25 @@ record(seq, "$(P):Cancel") {
   field(DOL2, "1")
   field(DLY2, "1")
   field(LNK2, "$(P):SendCancel.PROC PP")
-  field(DOL3, "0")
-  field(DLY3, "2")
-  field(LNK3, "$(P):ControlPoll PP")
+  field(DOL3, "2")
+  field(DLY3, "1")
+  field(LNK3, "$(P):ScanOnce.PROC PP")
+  field(DOL4, "0")
+  field(DLY4, "2")
+  field(LNK4, "$(P):ControlPoll PP")
 }
 record(stringin, "$(P):SendCancel") {
   field(DTYP, "stream")
   field(INP, "@mt.proto mtCancel $(PORT) $(ADDR)")
+}
+record(seq, "$(P):ScanOnce") {
+  field(PINI, "YES")
+  field(DOL1, "1")
+  field(DLY1, "0")
+  field(LNK1, "$(P):SI:Read.PROC PP")
+  field(DOL2, "1")
+  field(DLY2, "0.2")
+  field(LNK2, "$(P):ReadTare.PROC PP")
 }
 
 # ///
@@ -128,7 +144,6 @@ record(ai, "$(P):SI") {
   field(HIGH,"10000")
   field(LOW,"-10000")
   field(LOLO,"-50000")
-  field(SDIS, "$(P):ControlPoll")
   info(autosaveFields, "HIHI HIGH LOW LOLO AOFF")
   info(archive, "Monitor, 00:00:01, VAL")   
 }
@@ -162,8 +177,13 @@ record(mbbo, "$(P):SI:Scan") {
   field(FVST, "2 Hz")
   field(SXST, "5 Hz")
   field(SVST, "10 Hz")
-  field(OUT, "$(P):SI.SCAN PP")
+  field(OUT, "$(P):SI:DoScan.SCAN PP")
   info(autosaveFields, "VAL")
+}
+record(bo, "$(P):SI:DoScan") {
+  field(VAL, "1")
+  field(OUT, "$(P):SI.PROC PP")
+  field(SDIS, "$(P):ControlPoll")
 }
 
 
