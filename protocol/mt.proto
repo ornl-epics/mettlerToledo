@@ -21,7 +21,7 @@ ReplyTimeout = 1000;
 LongTimeout = 60000;
 
 ###################################################
-# Functions to run once at startup
+# General functions
 
 # Note: for the string commands the device will send 
 #       a string back in quotes like "blah" so it's 
@@ -58,6 +58,7 @@ mtI5 {
    out "I5";
    in "I5 A \"%[^\"]\"";
 }
+
 
 ###################################################
 # Immediate response or fast set/read functions

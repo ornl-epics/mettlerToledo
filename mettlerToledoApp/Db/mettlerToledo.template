@@ -238,3 +238,29 @@ record(bo, "$(P):Z") {
   field(FLNK, "$(P):TA:Do")
 }
 
+# ///
+# /// Generic Asyn record for 
+# /// sending commands and reading
+# /// connected status
+# ///
+record(asyn,"$(P):Asyn")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"$(ADDR)")
+    field(OMAX,"1024")
+    field(IMAX,"1024")
+    field(OEOS,"\r\n")
+    field(IEOS,"\r\n")
+}
+record(bi, "$(P):Connected")
+{
+  field(PINI, "YES")
+  field(INP, "$(P):Asyn.CNCT CP MS")
+  field(ZNAM, "Disconnected")
+  field(ONAM, "Connected")
+  field(ZSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+
