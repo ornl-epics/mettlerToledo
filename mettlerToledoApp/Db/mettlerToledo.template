@@ -84,7 +84,7 @@ record(seq, "$(P):ScanOnce") {
   field(LNK1, "$(P):SI:Read.PROC PP")
   field(DOL2, "1")
   field(DLY2, "0.2")
-  field(LNK2, "$(P):ReadTare.PROC PP")
+  field(LNK2, "$(P):TareRead.PROC PP")
 }
 
 # ///
@@ -209,7 +209,7 @@ record(stringin, "$(P):ZI_STAT") {
 # /// Do an immediate tare, and also read back the tare weight, status and units
 # /// I'm not sure the TI weight readback is useful since the device seems to 
 # /// only give back the correct tare weight if I run TI again, or execute
-# /// TA. So I forward link to $(P):ReadTare.
+# /// TA. So I forward link to $(P):TareRead.
 # ///
 record(bo, "$(P):Tare") {
   field(DESC, "Immediate Tare")
@@ -222,7 +222,7 @@ record(ai, "$(P):TI") {
   field(INP, "@mt.proto mtSetTI($(P):TI) $(PORT) $(ADDR)")
   field(SCAN, "Passive")
   field(PREC, "$(PREC=3)")
-  field(FLNK, "$(P):ReadTare")
+  field(FLNK, "$(P):TareRead")
   info(archive, "Monitor, 00:00:01, VAL")   
 }
 record(stringin, "$(P):TI_STAT") {
@@ -236,7 +236,7 @@ record(stringin, "$(P):TI_EGU") {
 # ///
 # /// Read the stored tare weight
 # ///
-record(bo, "$(P):ReadTare") {
+record(bo, "$(P):TareRead") {
   field(VAL, "1")
   field(OUT, "$(P):TA.PROC PP")
 }
@@ -254,6 +254,24 @@ record(stringin, "$(P):TA_STAT") {
 record(stringin, "$(P):TA_EGU") {
   field(DESC, "Tare Weight Unit")
 }
+
+# ///
+# /// Clear the stored tare weight. Then read it back.
+# ///
+record(bo, "$(P):TareClear") {
+  field(VAL, "1")
+  field(OUT, "$(P):TAC.PROC PP")
+}
+record(bo, "$(P):TAC") {
+  field(DESC, "Tare Clear (TAC)")
+  field(DTYP, "stream")
+  field(OUT, "@mt.proto mtSetTAC($(P):TAC) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):TareRead")
+}
+record(stringin, "$(P):TAC_STAT") {
+  field(DESC, "Tare Clear Stat")
+}
+
 
 
 
