@@ -78,13 +78,12 @@ record(stringin, "$(P):SendCancel") {
   field(INP, "@mt.proto mtCancel $(PORT) $(ADDR)")
 }
 record(seq, "$(P):ScanOnce") {
-  field(PINI, "YES")
   field(DOL1, "1")
   field(DLY1, "0")
-  field(LNK1, "$(P):SI:Read.PROC PP")
+  field(LNK1, "$(P):SI:Do.PROC PP")
   field(DOL2, "1")
   field(DLY2, "0.2")
-  field(LNK2, "$(P):TareRead.PROC PP")
+  field(LNK2, "$(P):TA:Do.PROC PP")
 }
 
 # ///
@@ -152,7 +151,7 @@ record(mbbo, "$(P):SI:Scan") {
   field(FVST, "2 Hz")
   field(SXST, "5 Hz")
   field(SVST, "10 Hz")
-  field(OUT, "$(P):SI:DoScan.SCAN PP")
+  field(OUT, "$(P):SI:DoScan.SCAN")
   info(autosaveFields, "VAL")
 }
 record(bo, "$(P):SI:DoScan") {
@@ -202,6 +201,22 @@ record(bo, "$(P):TAC") {
   field(FLNK, "$(P):TA:Do")
 }
 
+# ///
+# /// Set the tare weight. 
+# /// Then read it back, so I forward link to $(P):TA:Read
+# ///
+record(ao, "$(P):TA_Set") {
+  field(DESC, "Set the tare weight")
+  field(DTYP, "stream")
+  field(OUT, "@mt.proto mtTASet($(P):TA) $(PORT) $(ADDR)")
+  field(PREC, "$(PREC=3)")
+  field(FLNK, "$(P):TA:Do")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+
+
+
+
 
 ########################################################
 # The following Weight, Tare and Zero commands block until
@@ -237,6 +252,12 @@ include "mettlerToledoStatusResponse.template"
 record(bo, "$(P):Z") {
   field(FLNK, "$(P):TA:Do")
 }
+
+########################################################
+# Software limits for the weights
+
+#record(
+
 
 # ///
 # /// Generic Asyn record for 

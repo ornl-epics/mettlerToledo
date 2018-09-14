@@ -91,6 +91,13 @@ mtTA {
    @mismatch {in "TA %(\$1_STAT)c";}
 }
 
+# /// Set the tare weight
+mtTASet {
+   out "TA %f %(\$1_EGU)s";
+   in "TA %(\$1_STAT)c %f %(\$1_EGU)s";
+   @mismatch {in "TA %(\$1_STAT)c";}
+}
+
 # /// Clear the tare weight
 mtTAC {
    out "TAC";
