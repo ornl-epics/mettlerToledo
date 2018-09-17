@@ -128,6 +128,7 @@ record(stringin, "$(P):I5") {
 substitute "CMD=SI"
 substitute "CMD_DESC=Immediate Weight"
 include "mettlerToledoWeightResponse.template"
+include "mettlerToledoAlarmLimits.template"
 
 # ///
 # /// Provide a menu to the user to set the polling frequency
@@ -222,7 +223,7 @@ record(ao, "$(P):TA_Set") {
 ########################################################
 # The following Weight, Tare and Zero commands block until
 # the scale is in stable state. There is some built in timeout 
-# in the scale, which seems to be around 20-30s.
+# in the scale, which seems to be around 30s.
 #
 
 # ///
@@ -231,6 +232,8 @@ record(ao, "$(P):TA_Set") {
 substitute "CMD=S"
 substitute "CMD_DESC=Stable Weight"
 include "mettlerToledoWeightResponse.template"
+include "mettlerToledoWeightResponseWrapper.template"
+include "mettlerToledoAlarmLimits.template"
 
 # ///
 # /// Stable Tare. Like above, read back the tare weight afterwards.
@@ -238,21 +241,24 @@ include "mettlerToledoWeightResponse.template"
 substitute "CMD=T"
 substitute "CMD_DESC=Stable Tare"
 include "mettlerToledoWeightResponse.template"
+include "mettlerToledoWeightResponseWrapper.template"
 
-record(ai, "$(P):T") {
-  field(FLNK, "$(P):TA:Do")
+record(bo, "$(P):$(CMD):DoWaitStatusClear") {
+  field(FLNK, "$(P):TA:Do")  
 }
 
 # ///
-# /// Stable Zero
+# /// Stable Zero. Then read back the tare weight afterwards.
 # ///
 substitute "CMD=Z"
 substitute "CMD_DESC=Stable Zero"
 include "mettlerToledoStatusResponse.template"
+include "mettlerToledoStatusResponseWrapper.template"
 
-record(bo, "$(P):Z") {
+record(bo, "$(P):$(CMD):DoWaitStatusClear") {
   field(FLNK, "$(P):TA:Do")
 }
+
 
 
 
