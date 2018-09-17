@@ -3,19 +3,18 @@
 # Protocol file for Mettler Toledo Balance.
 # 
 # This implements some of the MT-SICS commands 
-# (level 0 and level 1, which will apply across the
-# range of MT balances).
+# (level 0 and level 1), which will apply across the
+# range of MT balances.
 #
 # Oak Ridge National Lab, UT-Battelle, 2018.
 # 
 ##################################################
 
-
 ##################################################
 # General Settings
 
 Terminator = "\r\n";
-ReplyTimeout = 1000;
+ReplyTimeout = 2000;
 
 #The timeout for stable commands
 LongTimeout = 60000;
