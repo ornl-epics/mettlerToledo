@@ -1,7 +1,7 @@
 
 file mettlerToledo.template
 {
-pattern {P, PORT, ADDR}
-        {mkp:SE:Scale, MT1, 0}
+pattern {P, PORT, ADDR, PREC}
+        {mkp:SE:Scale, MT1, 0, 2}
 }
 

@@ -10,6 +10,7 @@
 # P - Base PV name
 # PORT - Bus/Port Address (eg. ASYN Port).
 # ADDR - Address on the bus (optional)
+# PREC - Display precision (optional. Default=3).
 # 
 #
 #######################################################
