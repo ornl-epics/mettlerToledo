@@ -1,0 +1,23 @@
+########################################################
+# Common database snippet used in mettlerToledo.template.
+# This can be used for commands that respond just a status.
+#
+# Macros in addition to those used in mettlerToledo.template:
+# CMD - the MT-SICS command
+# CMD_DESC - the description to use
+#
+
+record(bo, "$(P):$(CMD):Do") {
+  field(DESC, "$(CMD_DESC)")
+  field(VAL, "1")
+  field(OUT, "$(P):$(CMD).PROC PP")
+}
+record(bo, "$(P):$(CMD)") {
+  field(DESC, "$(CMD_DESC) $(CMD)")
+  field(DTYP, "stream")
+  field(OUT, "@mt.proto mt$(CMD)($(P):$(CMD)) $(PORT) $(ADDR)")
+}
+record(stringin, "$(P):$(CMD)_STAT") {
+  field(DESC, "$(CMD_DESC) Stat")
+}
+

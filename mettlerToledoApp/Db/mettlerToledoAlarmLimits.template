@@ -1,0 +1,91 @@
+
+###############################################################
+# Template to be used in mettlerToledo.template. 
+# This can provide a set of alarm limits for an ai record 
+# used in mettlerToledoWeightResponse.template.
+#
+# Macros in addition to those used in mettlerToledo.template:
+# CMD - the MT-SICS command
+#
+
+record(ao, "$(P):$(CMD):LimitAlarmHigh") {
+  field(PINI, "YES")
+  field(VAL, "10000")
+  field(PREC, "$(PREC=3)")
+  field(OUT, "$(P):$(CMD).HIHI NPP")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(ao, "$(P):$(CMD):LimitWarnHigh") {
+  field(PINI, "YES")
+  field(VAL, "9000")
+  field(PREC, "$(PREC=3)")
+  field(OUT, "$(P):$(CMD).HIGH NPP")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(ao, "$(P):$(CMD):LimitWarnLow") {
+  field(PINI, "YES")
+  field(VAL, "-9000")
+  field(PREC, "$(PREC=3)")
+  field(OUT, "$(P):$(CMD).LOW NPP")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(ao, "$(P):$(CMD):LimitAlarmLow") {
+  field(PINI, "YES")
+  field(VAL, "-10000")
+  field(PREC, "$(PREC=3)")
+  field(OUT, "$(P):$(CMD).LOLO NPP")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+
+record(seq, "$(P):$(CMD):LimitSeverity") {
+  field(PINI, "YES")
+  field(DOL1, "2")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DOL4, "2")
+  field(LNK1, "$(P):$(CMD).HHSV NPP")
+  field(LNK2, "$(P):$(CMD).HSV NPP")
+  field(LNK3, "$(P):$(CMD).LSV NPP")
+  field(LNK4, "$(P):$(CMD).LLSV NPP")
+}
+
+record(calcout, "$(P):$(CMD):LimitAlarmCalc") {
+  field(INPA, "$(P):$(CMD).SEVR CP")
+  field(INPB, "$(P):$(CMD):LimitAlarmControl CP")
+  field(CALC, "B!=0?A:0")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):$(CMD):LimitAlarm PP")
+}
+record(mbbo, "$(P):$(CMD):LimitAlarm") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZRST, "No Alarm")
+  field(ONST, "Minor Alarm")
+  field(TWST, "Major Alarm")
+  field(THST, "Invalid Alarm")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MINOR")
+  field(TWSV, "MAJOR")
+  field(THSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(bo, "$(P):$(CMD):LimitAlarmControl") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(ZSV, "MINOR")
+  field(OSV, "NO_ALARM")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+
+
+
+
+

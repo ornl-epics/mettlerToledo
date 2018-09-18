@@ -1,0 +1,30 @@
+########################################################
+# Common database snippet used in mettlerToledo.template.
+# This can be used for commands that respond with a weight.
+#
+# Macros in addition to those used in mettlerToledo.template:
+# CMD - the MT-SICS command
+# CMD_DESC - the description to use
+#
+
+record(bo, "$(P):$(CMD):Do") {
+  field(DESC, "$(CMD_DESC)")
+  field(VAL, "1")
+  field(OUT, "$(P):$(CMD).PROC PP")
+}
+record(ai, "$(P):$(CMD)") {
+  field(DESC, "$(CMD_DESC) $(CMD)")
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mt$(CMD)($(P):$(CMD)) $(PORT) $(ADDR)")
+  field(SCAN, "Passive")
+  field(PREC, "$(PREC=3)")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(stringin, "$(P):$(CMD)_STAT") {
+  field(DESC, "$(CMD_DESC) Stat")
+}
+record(stringin, "$(P):$(CMD)_EGU") {
+  field(DESC, "$(CMD_DESC) Unit")
+}
+
+
