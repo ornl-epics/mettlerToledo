@@ -9,14 +9,14 @@
 # Macros:
 # P - Base PV name
 # PORT - Bus/Port Address (eg. ASYN Port).
-# ADDR - Address on the bus (optional)
+# ADDR - Address on the bus (eg. 0)
 # PREC - Display precision (optional. Default=3).
 # 
-#
 #######################################################
 
 # ///
-# /// Enable/Disable polling
+# /// Enable/Disable polling. This is used by some of the 
+# /// sequences below.
 # ///
 record(bo, "$(P):ControlPoll") {
   field(PINI, "YES")
@@ -132,7 +132,7 @@ include "mettlerToledoAlarmLimits.template"
 
 # ///
 # /// Provide a menu to the user to set the polling frequency
-# /// We use a subset of the available SCAN options
+# /// We use a subset of the available SCAN field options
 # ///
 record(mbbo, "$(P):SI:Scan") {
   field(DTYP, "Raw Soft Channel")
@@ -260,7 +260,41 @@ record(bo, "$(P):$(CMD):DoWaitStatusClear") {
 }
 
 
+########################################################
+# General records and global alarm 
 
+record(calcout, "$(P):AlarmCalc") {
+  field(PINI, "YES")
+  field(INPA, "$(P):SI:LimitAlarm CP MS")
+  field(INPB, "$(P):S:LimitAlarm CP MS")
+  field(INPC, "$(P):AlarmControl CP")
+  field(CALC, "C=0?0:MAX(A,B)")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):Alarm PP")
+}
+record(mbbo, "$(P):Alarm") {
+  field(VAL, "0")
+  field(ZRST, "No Alarm")
+  field(ONST, "Minor Alarm")
+  field(TWST, "Major Alarm")
+  field(THST, "Invalid Alarm")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MINOR")
+  field(TWSV, "MAJOR")
+  field(THSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(bo, "$(P):AlarmControl") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(ZSV, "MINOR")
+  field(OSV, "NO_ALARM")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
 
 
 
