@@ -21,5 +21,4 @@ T2, T3, T4, T5 - read various scale information
 
 This software was tested on a Mettler Toledo New Classic MF ML4002E. 
 
-RS232 Settings: 9600 8N1 XON.XOFF
 
