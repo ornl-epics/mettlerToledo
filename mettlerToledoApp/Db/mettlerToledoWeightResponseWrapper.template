@@ -1,0 +1,30 @@
+
+###########################################################
+# This is meant to be included in mettlerToledo.template
+# after using mettlerToledoWeightResponse.template for a stable weight
+# command. It provides a wrapper that can be used to provide 
+# user feedback on an OPI. These commands can take a while to execute, 
+# so the user can monitor "$(P):$(CMD):DoWaitStatus to get some feedback.
+
+record(bo, "$(P):$(CMD):DoWait") {
+  field(DESC, "$(CMD_DESC)")
+  field(VAL, "1")
+  field(OUT, "$(P):$(CMD):DoWaitStatus PP")
+  field(FLNK, "$(P):$(CMD):Do")
+}
+record(bo, "$(P):$(CMD):DoWaitStatus") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "No Active Command")
+  field(ONAM, "Active Command")
+  field(OSV, "MINOR")
+  info(archive, "Monitor, 00:00:01, VAL")    
+}
+record(ai, "$(P):$(CMD)") {
+  field(FLNK, "$(P):$(CMD):DoWaitStatusClear")
+}
+record(bo, "$(P):$(CMD):DoWaitStatusClear") {
+  field(VAL, "0")
+  field(OUT, "$(P):$(CMD):DoWaitStatus PP")
+}
+

@@ -1,0 +1,326 @@
+
+#######################################################
+# 
+# Template file for Mettler Toledo Balances.
+#
+# This file provides MT-SICS level 0 and 1 functions
+# which should work across the Mettler Toledo range.
+#
+# Macros:
+# P - Base PV name
+# PORT - Bus/Port Address (eg. ASYN Port).
+# ADDR - Address on the bus (eg. 0)
+# PREC - Display precision (optional. Default=3).
+# 
+#######################################################
+
+# ///
+# /// Enable/Disable polling. This is used by some of the 
+# /// sequences below.
+# ///
+record(bo, "$(P):ControlPoll") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "Poll Enabled")
+  field(ONAM, "Poll Disabled")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+# ///
+# /// Startup commands
+# ///
+record(seq, "$(P):Info") {
+  field(PINI, "YES")
+  field(DOL1, "1")
+  field(DLY1, "0")
+  field(LNK1, "$(P):ControlPoll PP")
+  field(DOL2, "1")
+  field(DLY2, "0.5")
+  field(LNK2, "$(P):I2.PROC PP")
+  field(DOL3, "1")
+  field(DLY3, "0.2")
+  field(LNK3, "$(P):I3.PROC PP")
+  field(DOL4, "1")
+  field(DLY4, "0.2")
+  field(LNK4, "$(P):I4.PROC PP")
+  field(DOL5, "1")
+  field(DLY5, "0.2")
+  field(LNK5, "$(P):I5.PROC PP")
+  field(DOL6, "1")
+  field(DLY6, "0.2")
+  field(LNK6, "$(P):ScanOnce.PROC PP")
+  field(DOL7, "0")
+  field(DLY7, "0.5")
+  field(LNK7, "$(P):ControlPoll PP")
+}
+
+# ///
+# /// Do a cancel. This will cancel any active command and also clear
+# /// volatile memory such as tare weight. It's like a power cycle.
+# /// After the cancel I read a few of the immediate parameters back.
+# ///
+record(seq, "$(P):Cancel") {
+  field(DOL1, "1")
+  field(DLY1, "0")
+  field(LNK1, "$(P):ControlPoll PP")
+  field(DOL2, "1")
+  field(DLY2, "1")
+  field(LNK2, "$(P):SendCancel.PROC PP")
+  field(DOL3, "2")
+  field(DLY3, "1")
+  field(LNK3, "$(P):ScanOnce.PROC PP")
+  field(DOL4, "0")
+  field(DLY4, "2")
+  field(LNK4, "$(P):ControlPoll PP")
+}
+record(stringin, "$(P):SendCancel") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtCancel $(PORT) $(ADDR)")
+}
+record(seq, "$(P):ScanOnce") {
+  field(DOL1, "1")
+  field(DLY1, "0")
+  field(LNK1, "$(P):SI:Do.PROC PP")
+  field(DOL2, "1")
+  field(DLY2, "0.2")
+  field(LNK2, "$(P):TA:Do.PROC PP")
+}
+
+# ///
+# /// Read the device ID
+# ///
+record(stringin, "$(P):I2") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtI2 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the software version
+# ///
+record(stringin, "$(P):I3") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtI3 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the serial number
+# ///
+record(stringin, "$(P):I4") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtI4 $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Read the software ID
+# ///
+record(stringin, "$(P):I5") {
+  field(DTYP, "stream")
+  field(INP, "@mt.proto mtI5 $(PORT) $(ADDR)")
+}
+
+#######################################################
+# Weight, Tare and Zero commands
+
+# ///
+# /// Immedate Weight
+# ///
+substitute "CMD=SI"
+substitute "CMD_DESC=Immediate Weight"
+include "mettlerToledoWeightResponse.template"
+include "mettlerToledoAlarmLimits.template"
+
+# ///
+# /// Provide a menu to the user to set the polling frequency
+# /// We use a subset of the available SCAN field options
+# ///
+record(mbbo, "$(P):SI:Scan") {
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(ZRVL, "0") #Passive
+  field(ONVL, "3") #10 second
+  field(TWVL, "4") #5 second
+  field(THVL, "5") #2 second
+  field(FRVL, "6") #1 second
+  field(FVVL, "7") #0.5 second
+  field(SXVL, "8") #0.2 second
+  field(SVVL, "9") #0.1 second
+  field(ZRST, "Disabled")
+  field(ONST, "0.1 Hz")
+  field(TWST, "0.2 Hz")
+  field(THST, "0.5 Hz")
+  field(FRST, "1 Hz")
+  field(FVST, "2 Hz")
+  field(SXST, "5 Hz")
+  field(SVST, "10 Hz")
+  field(OUT, "$(P):SI:DoScan.SCAN")
+  info(autosaveFields, "VAL")
+}
+record(bo, "$(P):SI:DoScan") {
+  field(VAL, "1")
+  field(OUT, "$(P):SI.PROC PP")
+  field(SDIS, "$(P):ControlPoll")
+}
+
+# ///
+# /// Immedate Zero
+# ///
+substitute "CMD=ZI"
+substitute "CMD_DESC=Immediate Zero"
+include "mettlerToledoStatusResponse.template"
+
+record(bo, "$(P):ZI") {
+  field(FLNK, "$(P):TA:Do")
+}
+
+# ///
+# /// Do an immediate tare, and also read back the tare weight, status and units
+# /// I'm not sure the TI weight readback is useful since the device seems to 
+# /// only give back the correct tare weight if I run TI again, or execute
+# /// TA. So I forward link to $(P):TA:Read.
+# ///
+substitute "CMD=TI"
+substitute "CMD_DESC=Immediate Tare"
+include "mettlerToledoWeightResponse.template"
+
+substitute "CMD=TA"
+substitute "CMD_DESC=Read Tare"
+include "mettlerToledoWeightResponse.template"
+
+record(ai, "$(P):TI") {
+  field(FLNK, "$(P):TA:Do")
+}
+
+# ///
+# /// Clear the stored tare weight. 
+# /// Then read it back, so I forward link to $(P):TA:Read
+# ///
+substitute "CMD=TAC"
+substitute "CMD_DESC=Clear Tare"
+include "mettlerToledoStatusResponse.template"
+
+record(bo, "$(P):TAC") {
+  field(FLNK, "$(P):TA:Do")
+}
+
+# ///
+# /// Set the tare weight. 
+# /// Then read it back, so I forward link to $(P):TA:Read
+# ///
+record(ao, "$(P):TA_Set") {
+  field(DESC, "Set the tare weight")
+  field(DTYP, "stream")
+  field(OUT, "@mt.proto mtTASet($(P):TA) $(PORT) $(ADDR)")
+  field(PREC, "$(PREC=3)")
+  field(FLNK, "$(P):TA:Do")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+
+
+
+
+
+########################################################
+# The following Weight, Tare and Zero commands block until
+# the scale is in stable state. There is some built in timeout 
+# in the scale, which seems to be around 30s.
+#
+
+# ///
+# /// Stable Weight
+# ///
+substitute "CMD=S"
+substitute "CMD_DESC=Stable Weight"
+include "mettlerToledoWeightResponse.template"
+include "mettlerToledoWeightResponseWrapper.template"
+include "mettlerToledoAlarmLimits.template"
+
+# ///
+# /// Stable Tare. Like above, read back the tare weight afterwards.
+# ///
+substitute "CMD=T"
+substitute "CMD_DESC=Stable Tare"
+include "mettlerToledoWeightResponse.template"
+include "mettlerToledoWeightResponseWrapper.template"
+
+record(bo, "$(P):$(CMD):DoWaitStatusClear") {
+  field(FLNK, "$(P):TA:Do")  
+}
+
+# ///
+# /// Stable Zero. Then read back the tare weight afterwards.
+# ///
+substitute "CMD=Z"
+substitute "CMD_DESC=Stable Zero"
+include "mettlerToledoStatusResponse.template"
+include "mettlerToledoStatusResponseWrapper.template"
+
+record(bo, "$(P):$(CMD):DoWaitStatusClear") {
+  field(FLNK, "$(P):TA:Do")
+}
+
+
+########################################################
+# General records and global alarm 
+
+record(calcout, "$(P):AlarmCalc") {
+  field(PINI, "YES")
+  field(INPA, "$(P):SI:LimitAlarm CP MS")
+  field(INPB, "$(P):S:LimitAlarm CP MS")
+  field(INPC, "$(P):AlarmControl CP")
+  field(CALC, "C=0?0:MAX(A,B)")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):Alarm PP")
+}
+record(mbbo, "$(P):Alarm") {
+  field(VAL, "0")
+  field(ZRST, "No Alarm")
+  field(ONST, "Minor Alarm")
+  field(TWST, "Major Alarm")
+  field(THST, "Invalid Alarm")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MINOR")
+  field(TWSV, "MAJOR")
+  field(THSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+record(bo, "$(P):AlarmControl") {
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(ZSV, "MINOR")
+  field(OSV, "NO_ALARM")
+  info(autosaveFields, "VAL")
+  info(archive, "Monitor, 00:00:01, VAL")   
+}
+
+
+
+# ///
+# /// Generic Asyn record for 
+# /// sending commands and reading
+# /// connected status
+# ///
+record(asyn, "$(P):Asyn")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"$(ADDR)")
+    field(OMAX,"1024")
+    field(IMAX,"1024")
+    field(OEOS,"\r\n")
+    field(IEOS,"\r\n")
+}
+record(bi, "$(P):Connected")
+{
+  field(PINI, "YES")
+  field(INP, "$(P):Asyn.CNCT CP MS")
+  field(ZNAM, "Disconnected")
+  field(ONAM, "Connected")
+  field(ZSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+
